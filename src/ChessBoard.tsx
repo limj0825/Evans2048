@@ -2,9 +2,9 @@ import { Grid, Button } from 'antd-mobile';
 import React from 'react'
 class ChessBoard extends React.Component{
   state = {
-    num: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    now: 0,
-    best: 0
+    best: 0,
+    step: 0,
+    history: [{sco: 0, num: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}]
   }
 
   ChessData = (data) => {
@@ -16,9 +16,11 @@ class ChessBoard extends React.Component{
   get = (i, j) => {
     return i * 4 + j;
   }
+
   ClickUp = () => {
-    let arr = this.state.num.concat();
-    let sco = this.state.now;
+    let current = this.state.step;
+    let arr = this.state.history[current].num.concat();
+    let sco = this.state.history[current].sco;
     for (let j = 0; j < 4; j++)
     {
       let now = 0;
@@ -47,15 +49,18 @@ class ChessBoard extends React.Component{
         }
       }
     }
-    if (arr.toString() === this.state.num.toString())
+    if (arr.toString() === this.state.history[current].num.toString())
     {
       return ;
     }
-    this.setState({num: arr, now: sco}, this.start);
+    let NewData = {sco: sco, num: arr};
+    this.start(NewData);
   }
+
   ClickDown = () => {
-    let arr = this.state.num.concat();
-    let sco = this.state.now;
+    let current = this.state.step;
+    let arr = this.state.history[current].num.concat();
+    let sco = this.state.history[current].sco;
     for (let j = 0; j < 4; j++)
     {
       let now = 3;
@@ -84,15 +89,18 @@ class ChessBoard extends React.Component{
         }
       }
     }
-    if (arr.toString() === this.state.num.toString())
+    if (arr.toString() === this.state.history[current].num.toString())
     {
       return ;
     }
-    this.setState({num: arr, now: sco}, this.start);
+    let NewData = {sco: sco, num: arr};
+    this.start(NewData);
   }
+
   ClickLeft = () => {
-    let arr = this.state.num.concat();
-    let sco = this.state.now;
+    let current = this.state.step;
+    let arr = this.state.history[current].num.concat();
+    let sco = this.state.history[current].sco;
     for (let i = 0; i < 4; i++)
     {
       let now = 0;
@@ -121,15 +129,18 @@ class ChessBoard extends React.Component{
         }
       }
     }
-    if (arr.toString() === this.state.num.toString())
+    if (arr.toString() === this.state.history[current].num.toString())
     {
       return ;
     }
-    this.setState({num: arr, now: sco}, this.start);
+    let NewData = {sco: sco, num: arr};
+    this.start(NewData);
   }
+
   ClickRight = () => {
-    let arr = this.state.num.concat();
-    let sco = this.state.now;
+    let current = this.state.step;
+    let arr = this.state.history[current].num.concat();
+    let sco = this.state.history[current].sco;
     for (let i = 0; i < 4; i++)
     {
       let now = 3;
@@ -158,12 +169,14 @@ class ChessBoard extends React.Component{
         }
       }
     }
-    if (arr.toString() === this.state.num.toString())
+    if (arr.toString() === this.state.history[current].num.toString())
     {
       return ;
     }
-    this.setState({num: arr, now: sco}, this.start);
+    let NewData = {sco: sco, num: arr};
+    this.start(NewData);
   }
+
   checkStart = (props) => {
     let flag = false;
     for (let i = 0; i < props.length; i++)
@@ -175,21 +188,18 @@ class ChessBoard extends React.Component{
     }
     return flag;
   }
+
   clear = () => {
     if (!window.confirm("确定重来吗?"))
     {
       return ;
     }
-    let arr = new Array(16);
-    for (let i = 0; i < 16; i++)
-    {
-      arr[i] = 0;
-    }
-    this.setState({num: arr, now: 0});
+    this.setState({step: 0});
   }
-  start = () => {
+
+  start = (data) => {
     let flag = false;
-    let arr = this.state.num;
+    let arr = data.num.concat();
     while (!flag)
     {
       let lab = Math.floor((Math.random()*16));
@@ -200,9 +210,11 @@ class ChessBoard extends React.Component{
       arr[lab] = Math.random() >= 0.1 ? 2 : 4;
       flag = true;
     }
-    let be = this.state.best > this.state.now ? this.state.best: this.state.now;
-    this.setState({num: arr, best: be});
+    let be = this.state.best > data.sco ? this.state.best: data.sco;
+    let history = this.state.history.slice(0, this.state.step + 1).concat({num: arr, sco: data.sco})
+    this.setState({history: history, best: be, step: this.state.step + 1});
   }
+
   GameEnd = (props) => {
     let arr = props;
     for (let i = 0; i < 16; i++)
@@ -234,15 +246,23 @@ class ChessBoard extends React.Component{
     }
     return true;
   }
+
+  Withdraw = (step) => {
+    this.setState({step});
+  }
+
   render() {
-    const check = this.checkStart(this.state.num);
-    const IsEnd = this.GameEnd(this.state.num);
+    const current = this.state.step;
+    const check = this.checkStart(this.state.history[current].num);
+    const IsEnd = this.GameEnd(this.state.history[current].num);
     return (
       <div style={{marginTop: '100px'}}>
-        <h1>当前分数: {this.state.now}<br/>最高分数: {this.state.best}</h1>
-        <Grid data={this.ChessData(this.state.num) } columnNum={4}
+        <h1>当前分数: {this.state.history[current].sco}<br/>最高分数: {this.state.best}</h1>
+        <Grid data={this.ChessData(this.state.history[current].num) } columnNum={4}
           renderItem={dataItem => (
-            <img src={dataItem.icon} style={{height: '100%', width: '100%'}}/>
+            <div>
+              <img src={dataItem.icon} style={{height: '100%', width: '100%'}} alt={"empty"}/>
+            </div>
           )}
         />
         <Button inline size="large" onClick={this.ClickUp} disabled={!check || IsEnd}>↑</Button>
@@ -251,7 +271,8 @@ class ChessBoard extends React.Component{
         <Button inline size="large" onClick={this.ClickDown} disabled={!check || IsEnd}>↓</Button>
         <Button inline size="large" onClick={this.ClickRight} disabled={!check || IsEnd}>→</Button>
         <br/>
-        <Button inline size="large" type={"primary"} disabled={check} style={{marginTop: '20px'}} onClick={this.start}>开始</Button>
+        <Button inline size="large" type={"primary"} disabled={current < 1} onClick={() => {this.Withdraw(current - 1)}}>上一步</Button>
+        <Button inline size="large" type={"primary"} disabled={check} style={{marginTop: '20px'}} onClick={() => {this.start(this.state.history[0])}}>开始</Button>
         <Button inline size="large" type={"primary"} disabled={!check} onClick={this.clear}>重来</Button>
       </div>
     )
