@@ -1,5 +1,6 @@
 import { Grid, Button } from 'antd-mobile';
 import React from 'react'
+import { Swipe } from 'react-swipe-component'
 class ChessBoard extends React.Component{
   state = {
     best: 0,
@@ -249,27 +250,25 @@ class ChessBoard extends React.Component{
 
   Withdraw = (step) => {
     this.setState({step});
+    // let x = document.getElementsByClassName("Up");
+    // this.setState({step}, () => Simulate.click(x[0]));
   }
 
   render() {
     const current = this.state.step;
     const check = this.checkStart(this.state.history[current].num);
-    const IsEnd = this.GameEnd(this.state.history[current].num);
     return (
       <div style={{marginTop: '100px'}}>
         <h1>当前分数: {this.state.history[current].sco}<br/>最高分数: {this.state.best}</h1>
-        <Grid data={this.ChessData(this.state.history[current].num) } columnNum={4}
-          renderItem={dataItem => (
-            <div>
-              <img src={dataItem.icon} style={{height: '100%', width: '100%'}} alt={"empty"}/>
-            </div>
-          )}
-        />
-        <Button inline size="large" onClick={this.ClickUp} disabled={!check || IsEnd}>↑</Button>
-        <br/>
-        <Button inline size="large" onClick={this.ClickLeft} disabled={!check || IsEnd}>←</Button>
-        <Button inline size="large" onClick={this.ClickDown} disabled={!check || IsEnd}>↓</Button>
-        <Button inline size="large" onClick={this.ClickRight} disabled={!check || IsEnd}>→</Button>
+        <Swipe detectTouch={true} onSwipedLeft={this.ClickLeft} onSwipedRight={this.ClickRight} onSwipedUp={this.ClickUp} onSwipedDown={this.ClickDown}>
+          <Grid data={this.ChessData(this.state.history[current].num) } columnNum={4}
+            renderItem={dataItem => (
+              <div>
+                <img src={dataItem.icon} style={{height: '100%', width: '100%'}} alt={"empty"}/>
+              </div>
+            )}
+          />
+        </Swipe>
         <br/>
         <Button inline size="large" type={"primary"} disabled={current < 1} onClick={() => {this.Withdraw(current - 1)}}>上一步</Button>
         <Button inline size="large" type={"primary"} disabled={check} style={{marginTop: '20px'}} onClick={() => {this.start(this.state.history[0])}}>开始</Button>
