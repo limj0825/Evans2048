@@ -1,6 +1,7 @@
 import { Grid, Button } from 'antd-mobile';
 import React from 'react'
 import { Swipe } from 'react-swipe-component'
+import { Animated } from 'react-animated-css'
 class ChessBoard extends React.Component{
   state = {
     best: 0,
@@ -273,10 +274,12 @@ class ChessBoard extends React.Component{
             :
             <Swipe detectTouch={true} onSwipedLeft={this.ClickLeft} onSwipedRight={this.ClickRight} onSwipedUp={this.ClickUp} onSwipedDown={this.ClickDown}>
               <Grid data={this.ChessData(this.state.history[current].num)} columnNum={4}
-                    renderItem={dataItem => (
-                      <div>
-                        <img src={dataItem.icon} style={{height: '100%', width: '100%'}} alt={"empty"}/>
-                      </div>
+                    renderItem={(dataItem, index) => (
+                      <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={this.state.history[current].num[index] !== 0}>
+                        <div>
+                          <img src={dataItem.icon} style={{height: '100%', width: '100%'}} alt={"empty"}/>
+                        </div>
+                      </Animated>
                     )}
               />
             </Swipe>
