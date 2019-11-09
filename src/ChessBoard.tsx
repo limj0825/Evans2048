@@ -277,7 +277,11 @@ class ChessBoard extends React.Component{
                     renderItem={(dataItem, index) => (
                       <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={this.state.history[current].num[index] !== 0}>
                         <div>
-                          <img src={dataItem.icon} style={{height: '100%', width: '100%'}} alt={"empty"}/>
+                          {
+                            this.state.history[current].num[index] !== 0
+                            &&
+                            <img src={dataItem.icon} style={{height: '100%', width: '100%'}} alt={"empty"}/>
+                          }
                         </div>
                       </Animated>
                     )}
