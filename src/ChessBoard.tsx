@@ -11,7 +11,13 @@ class ChessBoard extends React.Component{
 
   ChessData = (data) => {
     return data.map((_) => {
-      return {icon: require(`../public/number/${_}.jpg`)};
+      if (_ != 0)
+      {
+        return {icon: require(`../public/number/${_}.gif`)};
+      }
+      else {
+        return {icon: require(`../public/number/${_}.jpg`)};
+      }
     })
   }
 
@@ -197,6 +203,9 @@ class ChessBoard extends React.Component{
       return ;
     }
     this.setState({step: 0});
+    // console.log(window.innerWidth, window.innerHeight);
+    // let grid = document.getElementsByClassName("test").item(0);
+    // console.log(grid.clientWidth, grid.clientHeight)
   }
 
   start = (data) => {
@@ -215,8 +224,12 @@ class ChessBoard extends React.Component{
     let be = this.state.best > data.sco ? this.state.best: data.sco;
     let history = this.state.history.slice(0, this.state.step + 1).concat({num: arr, sco: data.sco})
     this.setState({history: history, best: be, step: this.state.step + 1});
+    let date = {name: 'ax', text: `当前分数是${data.sco}`};
+    fetch(`http://101.132.131.241:825/api/message`,{
+      method: 'POST',
+      body: JSON.stringify(date)
+    })
   }
-
   GameEnd = (props) => {
     let arr = props;
     for (let i = 0; i < 16; i++)
